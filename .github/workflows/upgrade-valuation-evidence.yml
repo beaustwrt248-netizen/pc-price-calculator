@@ -1,0 +1,37 @@
+name: Upgrade valuation evidence
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/upgrade-valuation-evidence.yml']
+permissions:
+  contents: write
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Add evidence-aware valuation UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old='<div class="sectionTitle">eBay AU comparable used devices</div><div id="lapEbay" class="results"></div>\n<div class="sectionTitle">Google Shopping AU new devices</div><div id="lapGoogle" class="results"></div>'
+          new='<div class="sectionTitle">Valuation evidence</div><div id="lapEvidence" class="results"></div>\n<div class="sectionTitle">eBay AU comparable used devices</div><div id="lapEbay" class="results"></div>\n<div class="sectionTitle">Google Shopping AU new devices</div><div id="lapGoogle" class="results"></div>'
+          if old in s: s=s.replace(old,new,1)
+          old2="lapConfidence.textContent='0%';lapType.textContent='—';lapEbay.innerHTML='';lapGoogle.innerHTML='';"
+          new2="lapConfidence.textContent='0%';lapType.textContent='—';lapEbay.innerHTML='';lapGoogle.innerHTML='';if(window.lapEvidence)lapEvidence.innerHTML='';"
+          s=s.replace(old2,new2,1)
+          old3="const confidence=Math.min(100,(gCount?35:0)+(eCount?45:0)+(/\\b[A-Z0-9]{4,}(?:-[A-Z0-9]+)+\\b/i.test(q)?20:10));"
+          new3="const exactModel=/\\b[A-Z0-9]{4,}(?:-[A-Z0-9]+)+\\b/i.test(q); const estimated=!!ep?.estimatedFromNew; const confidence=Math.min(95,(exactModel?20:10)+Math.min(gCount,3)*8+Math.min(eCount,5)*10-(estimated?25:0));"
+          s=s.replace(old3,new3,1)
+          marker="lapStatus.textContent=`Search: ${q} • ${gCount} Google new offers • ${eCount} eBay used matches${ep?.estimatedFromNew?' • used value estimated from new retail':''}`;"
+          add=marker+"\n    if(window.lapEvidence){const basis=estimated?'Estimated from credible new retail — no direct used comparable supported the used figure.':'Direct used-market evidence contributed to the valuation.';lapEvidence.innerHTML=`<div class=\"result\"><strong>Pricing basis</strong><br>${esc(basis)}<br><span class=\"muted\">${eCount} used matches • ${gCount} new offers • confidence ${confidence}%</span></div><div class=\"result\"><strong>Sanity checks</strong><br>Used value ${money(used)} vs new ${money(newP)} (${newP?Math.round(used/newP*100):0}%)<br><span class=\"muted\">${isMac?82:75}% maximum used/new cap applied.</span></div>`;}"
+          s=s.replace(marker,add,1)
+          p.write_text(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Improve valuation confidence and evidence display'
+          git push

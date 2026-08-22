@@ -1,77 +1,33 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0b1020" />
-  <title>PC Price Calculator</title>
-  <style>
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b1020;color:#edf2ff}.wrap{max-width:1100px;margin:auto;padding:24px}.hero{padding:28px;border:1px solid #24304f;background:linear-gradient(135deg,#121a31,#0c1327);border-radius:22px;margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:clamp(28px,6vw,48px)}.hero p{margin:0;color:#aebbd7}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:#11182b;border:1px solid #25304b;border-radius:18px;padding:18px}.card h2{font-size:18px;margin:0 0 14px}label{display:block;color:#aebbd7;font-size:13px;margin:12px 0 6px}input,select{width:100%;background:#0a1020;color:#fff;border:1px solid #33415f;border-radius:12px;padding:12px;font-size:16px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.stat{background:#0a1020;border:1px solid #25304b;padding:12px;border-radius:14px}.stat small{color:#93a2c5;display:block}.stat strong{font-size:22px;display:block;margin-top:4px}.good{color:#8ff0b5}.warn{color:#ffd27a}.bad{color:#ff9090}.parts{margin-top:16px}.partrow{display:grid;grid-template-columns:1.5fr .8fr .8fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #232d46}.partrow:last-child{border-bottom:0}.partrow span{color:#b6c1dd}.muted{color:#8d9abc;font-size:13px}.footer{margin-top:18px;color:#8090b7;font-size:12px;text-align:center}@media(max-width:600px){.partrow{grid-template-columns:1fr 1fr}.partrow span{grid-column:1/-1}}
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020">
+<title>PC Price Calculator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b1020;color:#edf2ff}.wrap{max-width:1150px;margin:auto;padding:18px}.hero{padding:24px;border:1px solid #24304f;background:linear-gradient(135deg,#121a31,#0c1327);border-radius:22px;margin-bottom:16px}.hero h1{margin:0 0 7px;font-size:clamp(28px,6vw,46px)}.hero p{margin:0;color:#aebbd7}.livebadge{display:inline-block;margin-top:12px;padding:7px 10px;border-radius:999px;background:#0b2a20;color:#8ff0b5;border:1px solid #215541;font-size:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.card{background:#11182b;border:1px solid #25304b;border-radius:18px;padding:17px}.card h2{font-size:18px;margin:0 0 12px}label{display:block;color:#aebbd7;font-size:13px;margin:11px 0 6px}input,select,button{font:inherit}input,select{width:100%;background:#0a1020;color:#fff;border:1px solid #33415f;border-radius:11px;padding:11px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.stat{background:#0a1020;border:1px solid #25304b;padding:11px;border-radius:13px}.stat small{color:#93a2c5;display:block}.stat strong{font-size:21px;display:block;margin-top:4px}.good{color:#8ff0b5}.warn{color:#ffd27a}.bad{color:#ff9090}.parts{margin-top:15px}.muted{color:#8d9abc;font-size:13px}.partrow{display:grid;grid-template-columns:1fr 1.5fr .75fr .75fr auto;gap:8px;align-items:end;padding:12px 0;border-bottom:1px solid #232d46}.partname{font-weight:700;align-self:center}.field small{display:block;color:#7f8dab;font-size:11px;margin-bottom:4px}.livebtn{border:0;border-radius:11px;padding:11px 12px;background:#2563eb;color:white;font-weight:700;cursor:pointer;white-space:nowrap}.livebtn:disabled{opacity:.55}.status{grid-column:2/-1;font-size:12px;color:#8d9abc;min-height:18px}.status.ok{color:#8ff0b5}.status.err{color:#ff9090}.searchcard{margin-top:15px}.searchline{display:grid;grid-template-columns:1fr auto;gap:8px}.results{margin-top:12px;display:grid;gap:8px}.result{padding:10px;border:1px solid #25304b;border-radius:12px;background:#0a1020}.result a{color:#a9c6ff;text-decoration:none}.footer{margin-top:18px;color:#8090b7;font-size:12px;text-align:center}@media(max-width:760px){.partrow{grid-template-columns:1fr 1fr}.partname,.status{grid-column:1/-1}.livebtn{width:100%}.stats{grid-template-columns:1fr 1fr}}
+</style>
 </head>
-<body>
-<div class="wrap">
-  <section class="hero">
-    <h1>PC Price Calculator</h1>
-    <p>Compare second-hand asking prices against new-part value and estimate a safe buy price in AUD.</p>
-  </section>
-
-  <section class="grid">
-    <div class="card">
-      <h2>Whole PC deal</h2>
-      <label>Seller asking price (AUD)</label>
-      <input id="asking" type="number" min="0" step="1" value="900" />
-      <label>Target gross profit</label>
-      <select id="margin"><option value="0.25">25%</option><option value="0.30" selected>30%</option><option value="0.35">35%</option><option value="0.40">40%</option></select>
-      <label>Used-value factor vs new</label>
-      <select id="usedFactor"><option value="0.55">55%</option><option value="0.60">60%</option><option value="0.65" selected>65%</option><option value="0.70">70%</option><option value="0.75">75%</option></select>
-      <div class="stats">
-        <div class="stat"><small>New parts total</small><strong id="newTotal">$0</strong></div>
-        <div class="stat"><small>Est. used value</small><strong id="usedTotal">$0</strong></div>
-        <div class="stat"><small>Max buy price</small><strong id="maxBuy" class="good">$0</strong></div>
-        <div class="stat"><small>Deal verdict</small><strong id="verdict">—</strong></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Profit estimate</h2>
-      <label>Expected resale price (optional)</label>
-      <input id="resale" type="number" min="0" step="1" placeholder="Uses estimated used value" />
-      <label>Selling fees %</label>
-      <input id="fees" type="number" min="0" max="100" step="0.1" value="13.4" />
-      <label>Other costs (shipping / repair)</label>
-      <input id="other" type="number" min="0" step="1" value="0" />
-      <div class="stats">
-        <div class="stat"><small>Net sale proceeds</small><strong id="netSale">$0</strong></div>
-        <div class="stat"><small>Profit at asking</small><strong id="profit">$0</strong></div>
-        <div class="stat"><small>Profit margin</small><strong id="profitMargin">0%</strong></div>
-        <div class="stat"><small>Discount needed</small><strong id="discountNeeded">$0</strong></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="card parts">
-    <h2>Parts valuation</h2>
-    <p class="muted">Enter current new prices. Later we can connect live retailer and sold-listing data.</p>
-    <div id="parts"></div>
-  </section>
-  <div class="footer">AUD pricing • values are estimates, not guarantees</div>
+<body><div class="wrap">
+<section class="hero"><h1>PC Price Calculator</h1><p>Compare a second-hand PC against part values, live eBay AU asking prices and your target profit.</p><span class="livebadge">● eBay AU live pricing connected</span></section>
+<section class="grid">
+<div class="card"><h2>Whole PC deal</h2><label>Seller asking price (AUD)</label><input id="asking" type="number" min="0" value="900"><label>Target gross profit</label><select id="margin"><option value="0.25">25%</option><option value="0.30" selected>30%</option><option value="0.35">35%</option><option value="0.40">40%</option></select><label>Fallback used-value factor vs new</label><select id="usedFactor"><option value="0.55">55%</option><option value="0.60">60%</option><option value="0.65" selected>65%</option><option value="0.70">70%</option><option value="0.75">75%</option></select><div class="stats"><div class="stat"><small>New parts total</small><strong id="newTotal">$0</strong></div><div class="stat"><small>Est. used value</small><strong id="usedTotal">$0</strong></div><div class="stat"><small>Max buy price</small><strong id="maxBuy" class="good">$0</strong></div><div class="stat"><small>Deal verdict</small><strong id="verdict">—</strong></div></div></div>
+<div class="card"><h2>Profit estimate</h2><label>Expected resale price (optional)</label><input id="resale" type="number" min="0" placeholder="Uses estimated used value"><label>Selling fees %</label><input id="fees" type="number" min="0" max="100" step="0.1" value="13.4"><label>Other costs</label><input id="other" type="number" min="0" value="0"><div class="stats"><div class="stat"><small>Net sale proceeds</small><strong id="netSale">$0</strong></div><div class="stat"><small>Profit at asking</small><strong id="profit">$0</strong></div><div class="stat"><small>Profit margin</small><strong id="profitMargin">0%</strong></div><div class="stat"><small>Discount needed</small><strong id="discountNeeded">$0</strong></div></div></div>
+</section>
+<section class="card parts"><h2>Parts valuation + live eBay AU</h2><p class="muted">Type the exact model for each component, then tap Live eBay. The median live asking price is placed into Used value automatically. New price remains editable.</p><div id="parts"></div></section>
+<section class="card searchcard"><h2>Quick eBay market search</h2><div class="searchline"><input id="quickQuery" placeholder="e.g. RTX 4070, Ryzen 7 7800X3D"><button class="livebtn" id="quickBtn">Search eBay AU</button></div><div id="quickSummary" class="muted" style="margin-top:10px"></div><div id="quickResults" class="results"></div></section>
+<div class="footer">AUD pricing • eBay figures are live asking prices, not completed-sale guarantees</div>
 </div>
 <script>
-const defaults=[['CPU',320],['GPU',650],['Motherboard',180],['RAM',110],['SSD / Storage',120],['Power Supply',110],['Case',100],['CPU Cooler',70],['Other',0]];
+const API='https://ghdhairijqjqivqriigi.supabase.co/functions/v1/ebay-search';
+const defaults=[['CPU','Ryzen 7 7800X3D',320],['GPU','RTX 4070',650],['Motherboard','B650 motherboard',180],['RAM','32GB DDR5 RAM',110],['SSD / Storage','1TB NVMe SSD',120],['Power Supply','750W Gold PSU',110],['Case','ATX PC case',100],['CPU Cooler','CPU cooler',70],['Other','',0]];
 const partsEl=document.getElementById('parts');
-defaults.forEach(([name,val],i)=>{const row=document.createElement('div');row.className='partrow';row.innerHTML=`<span>${name}</span><input aria-label="${name} new price" class="newPrice" type="number" min="0" step="1" value="${val}"><input aria-label="${name} used price" class="usedOverride" type="number" min="0" step="1" placeholder="Used override">`;partsEl.appendChild(row)});
+defaults.forEach(([name,query,val],i)=>{const row=document.createElement('div');row.className='partrow';row.innerHTML=`<div class="partname">${name}</div><div class="field"><small>eBay search</small><input class="partQuery" value="${query}"></div><div class="field"><small>New $</small><input class="newPrice" type="number" min="0" value="${val}"></div><div class="field"><small>Used $</small><input class="usedOverride" type="number" min="0" placeholder="Auto"></div><button class="livebtn partLive" data-i="${i}">Live eBay</button><div class="status" id="status${i}"></div>`;partsEl.appendChild(row)});
 const money=n=>new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD',maximumFractionDigits:0}).format(Number.isFinite(n)?n:0);
-function calc(){
- const asking=+document.getElementById('asking').value||0, target=+document.getElementById('margin').value, factor=+document.getElementById('usedFactor').value, fees=(+document.getElementById('fees').value||0)/100, other=+document.getElementById('other').value||0;
- const newInputs=[...document.querySelectorAll('.newPrice')], usedOverrides=[...document.querySelectorAll('.usedOverride')];
- let newTotal=0, usedTotal=0; newInputs.forEach((el,i)=>{const n=+el.value||0;newTotal+=n;const u=+usedOverrides[i].value;usedTotal+=u>0?u:n*factor});
- const resaleInput=+document.getElementById('resale').value; const resale=resaleInput>0?resaleInput:usedTotal;
- const netSale=resale*(1-fees)-other; const maxBuy=Math.max(0,netSale*(1-target)); const profit=netSale-asking; const pm=resale>0?profit/resale:0; const discount=Math.max(0,asking-maxBuy);
- document.getElementById('newTotal').textContent=money(newTotal); document.getElementById('usedTotal').textContent=money(usedTotal); document.getElementById('maxBuy').textContent=money(maxBuy); document.getElementById('netSale').textContent=money(netSale); document.getElementById('profit').textContent=money(profit); document.getElementById('profitMargin').textContent=(pm*100).toFixed(1)+'%'; document.getElementById('discountNeeded').textContent=money(discount);
- const v=document.getElementById('verdict'); v.className=''; if(asking<=maxBuy){v.textContent='GOOD BUY';v.classList.add('good')}else if(asking<=maxBuy*1.10){v.textContent='NEGOTIATE';v.classList.add('warn')}else{v.textContent='TOO HIGH';v.classList.add('bad')}
-}
-document.addEventListener('input',calc);document.addEventListener('change',calc);calc();
-</script>
-</body>
-</html>
+async function ebaySearch(query,limit=30){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,limit})});const data=await r.json();if(!r.ok||!data.success)throw new Error(data.error||'eBay search failed');return data}
+async function searchPart(i,btn){const q=document.querySelectorAll('.partQuery')[i].value.trim(),status=document.getElementById('status'+i);if(!q){status.textContent='Enter a model/search term first.';status.className='status err';return}btn.disabled=true;status.textContent='Searching eBay Australia…';status.className='status';try{const d=await ebaySearch(q,30);const median=Number(d.pricing?.median||0);if(median>0)document.querySelectorAll('.usedOverride')[i].value=Math.round(median);status.textContent=`Median ${money(median)} • average ${money(Number(d.pricing?.average||0))} • analysed ${d.analysedListings} listings`;status.className='status ok';calc()}catch(e){status.textContent=e.message;status.className='status err'}finally{btn.disabled=false}}
+document.querySelectorAll('.partLive').forEach(b=>b.addEventListener('click',()=>searchPart(+b.dataset.i,b)));
+async function quickSearch(){const q=document.getElementById('quickQuery').value.trim(),btn=document.getElementById('quickBtn'),sum=document.getElementById('quickSummary'),box=document.getElementById('quickResults');if(!q)return;btn.disabled=true;sum.textContent='Searching eBay Australia…';box.innerHTML='';try{const d=await ebaySearch(q,20);sum.textContent=`Median ${money(d.pricing.median)} • average ${money(d.pricing.average)} • range ${money(d.pricing.lowest)}–${money(d.pricing.highest)} • ${d.analysedListings} analysed`;box.innerHTML=(d.items||[]).slice(0,6).map(x=>`<div class="result"><strong>${money(x.price)}</strong> · ${x.condition||'Condition not stated'}<br>${x.url?`<a href="${x.url}" target="_blank" rel="noopener">${x.title}</a>`:x.title}</div>`).join('')}catch(e){sum.textContent=e.message}finally{btn.disabled=false}}
+document.getElementById('quickBtn').addEventListener('click',quickSearch);document.getElementById('quickQuery').addEventListener('keydown',e=>{if(e.key==='Enter')quickSearch()});
+function calc(){const asking=+askingEl().value||0,target=+document.getElementById('margin').value,factor=+document.getElementById('usedFactor').value,fees=(+document.getElementById('fees').value||0)/100,other=+document.getElementById('other').value||0;const ns=[...document.querySelectorAll('.newPrice')],us=[...document.querySelectorAll('.usedOverride')];let newTotal=0,usedTotal=0;ns.forEach((el,i)=>{const n=+el.value||0;newTotal+=n;const u=+us[i].value;usedTotal+=u>0?u:n*factor});const resaleInput=+document.getElementById('resale').value,resale=resaleInput>0?resaleInput:usedTotal,netSale=resale*(1-fees)-other,maxBuy=Math.max(0,netSale*(1-target)),profit=netSale-asking,pm=resale>0?profit/resale:0,discount=Math.max(0,asking-maxBuy);document.getElementById('newTotal').textContent=money(newTotal);document.getElementById('usedTotal').textContent=money(usedTotal);document.getElementById('maxBuy').textContent=money(maxBuy);document.getElementById('netSale').textContent=money(netSale);document.getElementById('profit').textContent=money(profit);document.getElementById('profitMargin').textContent=(pm*100).toFixed(1)+'%';document.getElementById('discountNeeded').textContent=money(discount);const v=document.getElementById('verdict');v.className='';if(asking<=maxBuy){v.textContent='GOOD BUY';v.classList.add('good')}else if(asking<=maxBuy*1.10){v.textContent='NEGOTIATE';v.classList.add('warn')}else{v.textContent='TOO HIGH';v.classList.add('bad')}}
+function askingEl(){return document.getElementById('asking')}document.addEventListener('input',calc);document.addEventListener('change',calc);calc();
+</script></body></html>

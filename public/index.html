@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>PC Price Calculator</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b1020;color:#edf2ff}.wrap{max-width:1100px;margin:auto;padding:24px}.hero{padding:28px;border:1px solid #24304f;background:linear-gradient(135deg,#121a31,#0c1327);border-radius:22px;margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:clamp(28px,6vw,48px)}.hero p{margin:0;color:#aebbd7}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:#11182b;border:1px solid #25304b;border-radius:18px;padding:18px}.card h2{font-size:18px;margin:0 0 14px}label{display:block;color:#aebbd7;font-size:13px;margin:12px 0 6px}input,select{width:100%;background:#0a1020;color:#fff;border:1px solid #33415f;border-radius:12px;padding:12px;font-size:16px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.stat{background:#0a1020;border:1px solid #25304b;padding:12px;border-radius:14px}.stat small{color:#93a2c5;display:block}.stat strong{font-size:22px;display:block;margin-top:4px}.good{color:#8ff0b5}.warn{color:#ffd27a}.bad{color:#ff9090}.parts{margin-top:16px}.partrow{display:grid;grid-template-columns:1.5fr .8fr .8fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #232d46}.partrow:last-child{border-bottom:0}.partrow span{color:#b6c1dd}.muted{color:#8d9abc;font-size:13px}.footer{margin-top:18px;color:#8090b7;font-size:12px;text-align:center}@media(max-width:600px){.partrow{grid-template-columns:1fr 1fr}.partrow span{grid-column:1/-1}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>PC Price Calculator</h1>
+    <p>Compare second-hand asking prices against new-part value and estimate a safe buy price in AUD.</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h2>Whole PC deal</h2>
+      <label>Seller asking price (AUD)</label>
+      <input id="asking" type="number" min="0" step="1" value="900" />
+      <label>Target gross profit</label>
+      <select id="margin"><option value="0.25">25%</option><option value="0.30" selected>30%</option><option value="0.35">35%</option><option value="0.40">40%</option></select>
+      <label>Used-value factor vs new</label>
+      <select id="usedFactor"><option value="0.55">55%</option><option value="0.60">60%</option><option value="0.65" selected>65%</option><option value="0.70">70%</option><option value="0.75">75%</option></select>
+      <div class="stats">
+        <div class="stat"><small>New parts total</small><strong id="newTotal">$0</strong></div>
+        <div class="stat"><small>Est. used value</small><strong id="usedTotal">$0</strong></div>
+        <div class="stat"><small>Max buy price</small><strong id="maxBuy" class="good">$0</strong></div>
+        <div class="stat"><small>Deal verdict</small><strong id="verdict">—</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Profit estimate</h2>
+      <label>Expected resale price (optional)</label>
+      <input id="resale" type="number" min="0" step="1" placeholder="Uses estimated used value" />
+      <label>Selling fees %</label>
+      <input id="fees" type="number" min="0" max="100" step="0.1" value="13.4" />
+      <label>Other costs (shipping / repair)</label>
+      <input id="other" type="number" min="0" step="1" value="0" />
+      <div class="stats">
+        <div class="stat"><small>Net sale proceeds</small><strong id="netSale">$0</strong></div>
+        <div class="stat"><small>Profit at asking</small><strong id="profit">$0</strong></div>
+        <div class="stat"><small>Profit margin</small><strong id="profitMargin">0%</strong></div>
+        <div class="stat"><small>Discount needed</small><strong id="discountNeeded">$0</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card parts">
+    <h2>Parts valuation</h2>
+    <p class="muted">Enter current new prices. Later we can connect live retailer and sold-listing data.</p>
+    <div id="parts"></div>
+  </section>
+  <div class="footer">AUD pricing • values are estimates, not guarantees</div>
+</div>
+<script>
+const defaults=[['CPU',320],['GPU',650],['Motherboard',180],['RAM',110],['SSD / Storage',120],['Power Supply',110],['Case',100],['CPU Cooler',70],['Other',0]];
+const partsEl=document.getElementById('parts');
+defaults.forEach(([name,val],i)=>{const row=document.createElement('div');row.className='partrow';row.innerHTML=`<span>${name}</span><input aria-label="${name} new price" class="newPrice" type="number" min="0" step="1" value="${val}"><input aria-label="${name} used price" class="usedOverride" type="number" min="0" step="1" placeholder="Used override">`;partsEl.appendChild(row)});
+const money=n=>new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD',maximumFractionDigits:0}).format(Number.isFinite(n)?n:0);
+function calc(){
+ const asking=+document.getElementById('asking').value||0, target=+document.getElementById('margin').value, factor=+document.getElementById('usedFactor').value, fees=(+document.getElementById('fees').value||0)/100, other=+document.getElementById('other').value||0;
+ const newInputs=[...document.querySelectorAll('.newPrice')], usedOverrides=[...document.querySelectorAll('.usedOverride')];
+ let newTotal=0, usedTotal=0; newInputs.forEach((el,i)=>{const n=+el.value||0;newTotal+=n;const u=+usedOverrides[i].value;usedTotal+=u>0?u:n*factor});
+ const resaleInput=+document.getElementById('resale').value; const resale=resaleInput>0?resaleInput:usedTotal;
+ const netSale=resale*(1-fees)-other; const maxBuy=Math.max(0,netSale*(1-target)); const profit=netSale-asking; const pm=resale>0?profit/resale:0; const discount=Math.max(0,asking-maxBuy);
+ document.getElementById('newTotal').textContent=money(newTotal); document.getElementById('usedTotal').textContent=money(usedTotal); document.getElementById('maxBuy').textContent=money(maxBuy); document.getElementById('netSale').textContent=money(netSale); document.getElementById('profit').textContent=money(profit); document.getElementById('profitMargin').textContent=(pm*100).toFixed(1)+'%'; document.getElementById('discountNeeded').textContent=money(discount);
+ const v=document.getElementById('verdict'); v.className=''; if(asking<=maxBuy){v.textContent='GOOD BUY';v.classList.add('good')}else if(asking<=maxBuy*1.10){v.textContent='NEGOTIATE';v.classList.add('warn')}else{v.textContent='TOO HIGH';v.classList.add('bad')}
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);calc();
+</script>
+</body>
+</html>
